@@ -26,12 +26,13 @@ type BenchmarkData struct {
 
 type Benchmark struct {}
 
-
+// method send GET request to given url.
 func (benchmark *Benchmark) sendRequest(url string) int {
 	resp, _ := http.Get(url)
 	return resp.StatusCode
 }
 
+// method save data in MongoDB.
 func (benchmark *Benchmark) saveData(host *BenchmarkData) error {
 	dbSession := settings.MongoDB()
 	defer dbSession.Close()
@@ -39,6 +40,7 @@ func (benchmark *Benchmark) saveData(host *BenchmarkData) error {
 	return collection.Insert(&host)
 }
 
+// method measure duration between send request to given url and receive response from given url.
 func (benchmark *Benchmark) measureDuration(url string) BenchmarkData {
 	startTime := time.Now()
 	statusCode := benchmark.sendRequest(url)
@@ -66,6 +68,7 @@ func (benchmark *Benchmark) Process(url string, requestsNumber int) {
 	waitGroup.Wait()
 }
 
+// main method to run all process of benchmarking.
 func (benchmark *Benchmark) Run(url string, requestsNumber int) {
 	scan := Scanner{}
 	url = normalizeUrl(url)
