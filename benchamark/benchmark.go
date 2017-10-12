@@ -48,7 +48,7 @@ func (benchmark *Benchmark) measureDuration(url string) BenchmarkData {
 	return BenchmarkData{url, statusCode, duration}
 }
 
-// use this method to run benchamark for current host.
+// use this method to run benchmark for current host.
 // requestsNumber is a number of GET requests sent to given url.
 func (benchmark *Benchmark) Process(url string, requestsNumber int) {
 	requests := make(chan int)
