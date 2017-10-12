@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	goChart "github.com/wcharczuk/go-chart"
 	"net/http"
+	//"fmt"
 )
 
 type Chart struct {}
@@ -38,13 +39,28 @@ func (chart *Chart) prepareXY(data []benchamark.BenchmarkData) ([]float64, []flo
 }
 
 func (chart *Chart) Render(res http.ResponseWriter, req *http.Request) {
-	url := "http://145.239.91.118"
+	url := "http://147.135.208.25"
 	data := chart.getDataForURL(url)
 	x, y := chart.prepareXY(data)
 
 	graph := goChart.Chart{
+		XAxis: goChart.XAxis{
+			Name:      "Request Number",
+			NameStyle: goChart.StyleShow(),
+			Style:     goChart.StyleShow(),
+		},
+		YAxis: goChart.YAxis{
+			Name:      "Response Time",
+			NameStyle: goChart.StyleShow(),
+			Style:     goChart.StyleShow(),
+		},
 		Series: []goChart.Series{
 			goChart.ContinuousSeries{
+				Style: goChart.Style{
+					Show:        true,
+					StrokeColor: goChart.GetDefaultColor(0).WithAlpha(64),
+					FillColor:   goChart.GetDefaultColor(0).WithAlpha(64),
+				},
 				XValues: x,
 				YValues: y,
 			},
