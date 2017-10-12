@@ -33,11 +33,11 @@ func (benchmark *Benchmark) sendRequest(url string) int {
 }
 
 // method save data in MongoDB.
-func (benchmark *Benchmark) saveData(host *BenchmarkData) error {
+func (benchmark *Benchmark) saveData(benchmarkData *BenchmarkData) error {
 	dbSession := settings.MongoDB()
 	defer dbSession.Close()
 	collection := dbSession.DB("StressTests").C("hosts")
-	return collection.Insert(&host)
+	return collection.Insert(&benchmarkData)
 }
 
 // method measure duration between send request to given url and receive response from given url.
@@ -71,7 +71,7 @@ func (benchmark *Benchmark) Process(url string, requestsNumber int) {
 // main method to run all process of benchmarking.
 func (benchmark *Benchmark) Run(url string, requestsNumber int) {
 	scan := Scanner{}
-	url = normalizeUrl(url)
+	url = settings.NormalizeUrl(url)
 
 	// bench all internal urls
 	for _, url := range scan.ScanHost(url) {
