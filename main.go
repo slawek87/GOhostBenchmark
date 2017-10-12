@@ -1,8 +1,8 @@
 package main
 
-import "github.com/slawek87/GOhostBenchmark/inspection"
+import "github.com/slawek87/GOhostBenchmark/benchamark"
 
 func main() {
-    insp := inspection.InspectHost{}
-    insp.Inspect("http://147.135.208.25/watch/20", 1000)
+    bench := benchamark.Benchmark{}
+    bench.Run("http://145.239.91.118", 1000)
 }

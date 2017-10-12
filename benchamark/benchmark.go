@@ -9,7 +9,7 @@ The inspection process sends GET requests to a given host and saves information 
 All data is saved to MongoDB.
  */
 
-package inspection
+package benchamark
 
 import (
 	"net/http"
@@ -18,37 +18,37 @@ import (
 	"github.com/slawek87/GOhostBenchmark/settings"
 )
 
-type Host struct {
+type BenchmarkData struct {
 	URL         string
 	StatusCode      int
 	Duration    float64 // time in Seconds
 }
 
-type InspectHost struct {}
+type Benchmark struct {}
 
 
-func (inspection *InspectHost) sendRequest(url string) int {
+func (benchmark *Benchmark) sendRequest(url string) int {
 	resp, _ := http.Get(url)
 	return resp.StatusCode
 }
 
-func (inspection *InspectHost) saveData(host *Host) error {
+func (benchmark *Benchmark) saveData(host *BenchmarkData) error {
 	dbSession := settings.MongoDB()
 	defer dbSession.Close()
 	collection := dbSession.DB("StressTests").C("hosts")
 	return collection.Insert(&host)
 }
 
-func (inspection *InspectHost) measureDuration(url string) Host {
+func (benchmark *Benchmark) measureDuration(url string) BenchmarkData {
 	startTime := time.Now()
-	statusCode := inspection.sendRequest(url)
+	statusCode := benchmark.sendRequest(url)
 	duration := time.Since(startTime).Seconds()
-	return Host{url, statusCode, duration}
+	return BenchmarkData{url, statusCode, duration}
 }
 
-// use this method to run inspection for current host.
+// use this method to run benchamark for current host.
 // requestsNumber is a number of GET requests sent to given url.
-func (inspection *InspectHost) Inspect(url string, requestsNumber int) {
+func (benchmark *Benchmark) Process(url string, requestsNumber int) {
 	requests := make(chan int)
 	var waitGroup sync.WaitGroup
 
@@ -57,11 +57,23 @@ func (inspection *InspectHost) Inspect(url string, requestsNumber int) {
 	for i := 1; i <= requestsNumber; i++ {
 		go func() {
 			defer waitGroup.Done()
-			duration := inspection.measureDuration(url)
-			inspection.saveData(&duration)
+			duration := benchmark.measureDuration(url)
+			benchmark.saveData(&duration)
 			requests <- i
 		}()
 	}
 
 	waitGroup.Wait()
+}
+
+func (benchmark *Benchmark) Run(url string, requestsNumber int) {
+	scan := Scanner{}
+	url = normalizeUrl(url)
+
+	// bench all internal urls
+	for _, url := range scan.ScanHost(url) {
+		benchmark.Process(url, requestsNumber)
+	}
+	// bench tha main url.
+	benchmark.Process(url, requestsNumber)
 }
