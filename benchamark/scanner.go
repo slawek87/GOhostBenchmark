@@ -27,8 +27,10 @@ func (parser *Parser) findUrls(body io.ReadCloser, url string) []string {
 				links = append(links, url + value)
 			}
 		}
+		if line == html.ErrorToken {
+			return links
+		}
 	}
-	return links
 }
 
 // method returns value of href if exists.
