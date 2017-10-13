@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	//bench := benchamark.Benchmark{}
+	//bench := benchmark.Benchmark{}
 	//bench.Run("http://147.135.208.25", 1000)
 	chart := charts.Chart{}
 	render := chart.Render

@@ -77,6 +77,6 @@ func (benchmark *Benchmark) Run(url string, requestsNumber int) {
 	for _, url := range scan.ScanHost(url) {
 		benchmark.Process(url, requestsNumber)
 	}
-	// bench tha main url.
+	// bench main url.
 	benchmark.Process(url, requestsNumber)
 }
