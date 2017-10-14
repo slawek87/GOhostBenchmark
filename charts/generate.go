@@ -2,7 +2,7 @@ package charts
 
 import (
 	"github.com/slawek87/GOhostBenchmark/settings"
-	"github.com/slawek87/GOhostBenchmark/benchamark"
+	"github.com/slawek87/GOhostBenchmark/benchmark"
 	"gopkg.in/mgo.v2/bson"
 	goChart "github.com/wcharczuk/go-chart"
 	"net/http"
@@ -13,8 +13,8 @@ type Chart struct {}
 
 
 // returns data for given url.
-func (chart *Chart) getDataForURL(url string) []benchamark.BenchmarkData {
-	var result []benchamark.BenchmarkData
+func (chart *Chart) getDataForURL(url string) []benchmark.BenchmarkData {
+	var result []benchmark.BenchmarkData
 
 	url = settings.NormalizeUrl(url)
 
@@ -27,7 +27,7 @@ func (chart *Chart) getDataForURL(url string) []benchamark.BenchmarkData {
 	return result
 }
 
-func (chart *Chart) prepareXY(data []benchamark.BenchmarkData) ([]float64, []float64) {
+func (chart *Chart) prepareXY(data []benchmark.BenchmarkData) ([]float64, []float64) {
 	var x, y []float64
 
 	for key, value := range data {
@@ -38,8 +38,9 @@ func (chart *Chart) prepareXY(data []benchamark.BenchmarkData) ([]float64, []flo
 	return x, y
 }
 
-func (chart *Chart) Render(res http.ResponseWriter, req *http.Request) {
-	url := "http://147.135.208.25"
+func (chart *Chart) Render(response http.ResponseWriter, request *http.Request) {
+	url := request.URL.Query().Get("url")
+	url = settings.NormalizeUrl(url)
 	data := chart.getDataForURL(url)
 	x, y := chart.prepareXY(data)
 
@@ -67,6 +68,6 @@ func (chart *Chart) Render(res http.ResponseWriter, req *http.Request) {
 		},
 	}
 
-	res.Header().Set("Content-Type", "image/png")
-	graph.Render(goChart.PNG, res)
+	response.Header().Set("Content-Type", "image/png")
+	graph.Render(goChart.PNG, response)
 }

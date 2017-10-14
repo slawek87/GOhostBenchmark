@@ -1,4 +1,4 @@
-package benchamark
+package benchmark
 
 import (
 	"net/http"

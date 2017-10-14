@@ -9,7 +9,7 @@ The inspection process sends GET requests to a given host and saves information 
 All data is saved to MongoDB.
  */
 
-package benchamark
+package benchmark
 
 import (
 	"net/http"
