@@ -14,35 +14,43 @@ type Parser struct{}
 // parse website to find all urls.
 func (parser *Parser) findUrls(body io.ReadCloser, url string) []string {
 	var links []string
+	parseChannel := make(chan string)
+	linkChannel := make(chan []string)
 
 	readBody := html.NewTokenizer(body)
 
 	for {
 		line := readBody.Next()
 		if line == html.StartTagToken {
-			value := parser.getHrefValue(readBody.Token())
+			go parser.getHrefValue(readBody.Token(), parseChannel)
 
 			// gets only internal urls.
-			if (value != "") && strings.HasPrefix(value, "/")  {
-				links = append(links, url + value)
-			}
+			go func() {
+				value := <- parseChannel
+
+				if (value != "") && strings.HasPrefix(value, "/")  {
+					links = append(links, url + value)
+				}
+				linkChannel <- links
+			}()
+
 		}
 		if line == html.ErrorToken {
+			<- linkChannel
 			return links
 		}
 	}
 }
 
 // method returns value of href if exists.
-func (parser *Parser) getHrefValue(text html.Token) string {
+func (parser *Parser) getHrefValue(text html.Token, result chan string) {
 	if text.Data == "a" {
 		for _, attr := range text.Attr {
 			if attr.Key == "href" {
-				return attr.Val
+				result <- attr.Val
 			}
 		}
 	}
-	return ""
 }
 
 // scans website and returns unique links

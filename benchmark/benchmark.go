@@ -75,8 +75,13 @@ func (benchmark *Benchmark) Run(url string, requestsNumber int) {
 
 	// bench all internal urls
 	for _, url := range scan.ScanHost(url) {
-		benchmark.Process(url, requestsNumber)
+		go benchmark.Process(url, requestsNumber)
 	}
 	// bench main url.
-	benchmark.Process(url, requestsNumber)
+	go benchmark.Process(url, requestsNumber)
+}
+
+func (benchmark *Benchmark) Render(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "image/png")
+
 }
