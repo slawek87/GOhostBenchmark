@@ -75,10 +75,10 @@ func (benchmark *Benchmark) Run(url string, requestsNumber int) {
 
 	// bench all internal urls
 	for _, url := range scan.ScanHost(url) {
-		go benchmark.Process(url, requestsNumber)
+		benchmark.Process(url, requestsNumber)
 	}
 	// bench main url.
-	go benchmark.Process(url, requestsNumber)
+	benchmark.Process(url, requestsNumber)
 }
 
 func (benchmark *Benchmark) Render(response http.ResponseWriter, request *http.Request) {

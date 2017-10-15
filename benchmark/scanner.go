@@ -14,31 +14,22 @@ type Parser struct{}
 // parse website to find all urls.
 func (parser *Parser) findUrls(body io.ReadCloser, url string) []string {
 	var links []string
-	parseChannel := make(chan string)
-	linkChannel := make(chan []string)
-
+	valueChannel := make(chan string)
 	readBody := html.NewTokenizer(body)
 
 	for {
 		line := readBody.Next()
 		if line == html.StartTagToken {
-			go parser.getHrefValue(readBody.Token(), parseChannel)
-
-			// gets only internal urls.
-			go func() {
-				value := <- parseChannel
-
+			go parser.getHrefValue(readBody.Token(), valueChannel)
+		}
+		if line == html.ErrorToken {
+			for value := range valueChannel {
+				// gets only internal urls.
 				if (value != "") && strings.HasPrefix(value, "/")  {
 					links = append(links, url + value)
 				}
-				linkChannel <- links
-			}()
+			}
 
-		}
-		if line == html.ErrorToken {
-			<- linkChannel
-			close(parseChannel)
-			close(parseChannel)
 			return links
 		}
 	}
