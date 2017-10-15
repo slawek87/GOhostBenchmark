@@ -36,6 +36,7 @@ func (parser *Parser) findUrls(body io.ReadCloser, url string) []string {
 
 		}
 		if line == html.ErrorToken {
+			close(parseChannel)
 			<- linkChannel
 			return links
 		}
